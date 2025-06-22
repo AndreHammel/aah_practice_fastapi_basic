@@ -53,6 +53,29 @@ def test_update_user(client):
         'email': 'bob@email.com',
         'id': 1,
     }
+    response = client.put(
+        '/users/10',
+        json={
+            'username': 'bob',
+            'email': 'bob@email.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Deu ruim! Não achei'}
+
+
+def test_read_user_by_id(client):
+    response = client.get('/users/1')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        'username': 'bob',
+        'email': 'bob@email.com',
+        'id': 1,
+    }
+    response = client.get('/users/10')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Deu ruim! Não achei'}
 
 
 def test_delete_user(client):
@@ -63,3 +86,6 @@ def test_delete_user(client):
         'email': 'bob@email.com',
         'id': 1,
     }
+    response = client.delete('/users/10')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Deu ruim! Não achei'}

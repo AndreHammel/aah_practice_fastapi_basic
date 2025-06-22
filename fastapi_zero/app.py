@@ -56,3 +56,13 @@ def delete_user(user_id: int):
     user_deleted = database[user_id - 1]
     del database[user_id - 1]
     return user_deleted
+
+
+@app.get('/users/{id}', status_code=HTTPStatus.OK, response_model=UserPublic)
+def read_user_by_id(id: int):
+    if id < 1 or id > len(database):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='Deu ruim! Não achei'
+        )
+    user = database[id - 1]
+    return user
