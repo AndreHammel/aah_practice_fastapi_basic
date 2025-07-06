@@ -10,6 +10,7 @@ from sqlalchemy.pool import StaticPool
 from fastapi_zero.app import app
 from fastapi_zero.database import get_session
 from fastapi_zero.models import User, table_registry
+from fastapi_zero.security import get_password_hash
 
 
 @pytest.fixture
@@ -25,12 +26,16 @@ def client(session):
 
 @pytest.fixture
 def user(session: Session):
+    password = 'secret'
     user = User(
-        username='user-teste', email='user-teste@gmail.com', password='secret'
+        username='user-teste',
+        email='user-teste@gmail.com',
+        password=get_password_hash(password),
     )
     session.add(user)
     session.commit()
     session.refresh(user)
+    user.clean_password = password
     return user
 
 
@@ -65,3 +70,12 @@ def _mock_db_time(model, time=datetime(2025, 5, 20)):
 @pytest.fixture
 def mock_db_time():
     return _mock_db_time
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    return response.json()['access_token']
