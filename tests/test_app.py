@@ -26,12 +26,6 @@ def test_create_user(client):
     }
 
 
-# def test_read_users(client):
-#     response = client.get('/users/')
-#     assert response.status_code == HTTPStatus.OK
-#     assert response.json() == {'users': []}
-
-
 def test_read_users_with_users(client, user, token):
     response = client.get(
         '/users/', headers={'Authorization': f'Bearer {token}'}
@@ -83,7 +77,6 @@ def test_delete_user(client, user, token):
 
 
 def test_update_integrity_error(client, user, token):
-    # Inserindo fausto
     client.post(
         '/users',
         headers={'Authorization': f'Bearer {token}'},
@@ -94,7 +87,6 @@ def test_update_integrity_error(client, user, token):
         },
     )
 
-    # Alterando o user das fixture para fausto
     response_update = client.put(
         f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
@@ -109,22 +101,11 @@ def test_update_integrity_error(client, user, token):
         'detail': 'Username or Email already exists'
     }
 
-def test_jwt_invalid_token(client):
-   response = client.delete(
-       '/users/1', headers={'Authorization': 'Bearer token-invalido'}
-   )
-   
-   assert response.status_code == HTTPStatus.UNAUTHORIZED
-   assert response.json() == {'detail': 'Could not validate credentials'}
 
-# def test_read_user_by_id(client):
-#     response = client.get('/users/1')
-#     assert response.status_code == HTTPStatus.OK
-#     assert response.json() == {
-#         'username': 'bob',
-#         'email': 'bob@email.com',
-#         'id': 1,
-#     }
-#     response = client.get('/users/10')
-#     assert response.status_code == HTTPStatus.NOT_FOUND
-#     assert response.json() == {'detail': 'Deu ruim! Não achei'}
+def test_jwt_invalid_token(client):
+    response = client.delete(
+        '/users/1', headers={'Authorization': 'Bearer token-invalido'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
